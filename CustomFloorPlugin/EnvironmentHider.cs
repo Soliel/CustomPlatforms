@@ -51,6 +51,21 @@ namespace CustomFloorPlugin
         }
 
         /// <summary>
+        /// IEnumertor version of HideObjectsForPlatform
+        /// Required for compatibility with BS v0.11.2 because of Async
+        /// scene loading.
+        /// </summary>
+        /// <param name="platform">A platform that defines which objects are to be hidden</param>
+        public IEnumerator WaitForPlatformAndHideObjects(CustomPlatform platform)
+        {
+            yield return new WaitUntil(() =>
+                Resources.FindObjectsOfTypeAll<GameObject>()
+                    .Any(x => x.name == "MenuPlayersPlace" || x.name == "PlayersPlace"));
+
+            HideObjectsForPlatform(platform);
+        }
+
+        /// <summary>
         /// Finds all GameObjects that make up the default environment
         /// and groups them into array lists
         /// </summary>
@@ -68,6 +83,29 @@ namespace CustomFloorPlugin
             FindRotatingLasers();
             FindDoubleColorLasers();
             FindTrackLights();
+        }
+
+        /// <summary>
+        /// Waits until the enviornment loads in order to find it reliably.
+        /// This calls HideObjectsForPlatforms because they are always used together.
+        /// Required for BS v0.11.2 because of Async Scene Loading.
+        /// </summary>
+        /// <param name="platform">A platform that defines which objects are to be hidden</param>
+        public IEnumerator WaitForAndFindEnvironment(CustomPlatform platform)
+        {
+            Console.WriteLine("waiting for load.");
+            yield return new WaitUntil(() =>
+                Resources.FindObjectsOfTypeAll<GameObject>()
+                    .Any(x => x.name == "MenuPlayersPlace" || x.name == "PlayersPlace"));
+
+            yield return new WaitForSeconds(0.2f); //Waits for ~12 frames after the platform is loaded to make sure everything is ready to grab. I got lazy.
+
+            Console.WriteLine("Load complete.");
+
+            FindEnvironment();
+
+            Console.WriteLine("ENV found.");
+            HideObjectsForPlatform(platform);
         }
 
         /// <summary>

@@ -75,10 +75,9 @@ namespace CustomFloorPlugin
             PlatformUI.OnLoad();
             if (platforms.ElementAt(platformIndex) != null)
             {
-                // Find environment parts after scene change
-                envHider.FindEnvironment();
-
-                envHider.HideObjectsForPlatform(platforms.ElementAt(platformIndex));
+                Log("Loading platforms.");
+                //Finds and hides the environment after it loads.
+                StartCoroutine(envHider.WaitForAndFindEnvironment(platforms.ElementAt(platformIndex)));
             }
         }
 
@@ -94,17 +93,18 @@ namespace CustomFloorPlugin
         /// <param name="arg1">New Active Scene</param>
         private void SceneManagerOnActiveSceneChanged(Scene arg0, Scene arg1)
         {
+            Log("Scene changed.");
             if(arg1.name == "Menu")
             {
                 PlatformUI.OnLoad();
             }
             
+
             if (platforms.ElementAt(platformIndex) != null)
             {
-                // Find environment parts after scene change
-                envHider.FindEnvironment();
-
-                envHider.HideObjectsForPlatform(platforms.ElementAt(platformIndex));
+                Log("Loading Platforms");
+                //Finds and hides environment after it loads.
+                StartCoroutine(envHider.WaitForAndFindEnvironment(platforms.ElementAt(platformIndex)));
             }
         }
 
@@ -202,7 +202,7 @@ namespace CustomFloorPlugin
             newPlaform.gameObject.SetActive(true);
 
             // Hide environment for new platform
-            envHider.HideObjectsForPlatform(newPlaform);
+            StartCoroutine(envHider.WaitForPlatformAndHideObjects(platforms.ElementAt(platformIndex)));
 
             // Update lightSwitchEvent TubeLight references
             TubeLightManager.UpdateEventTubeLightList();
